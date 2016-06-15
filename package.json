@@ -1,0 +1,25 @@
+{
+  "name": "gulp-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "gulp-coffee": "^2.3.2",
+    "gulp-jade": "^1.1.0",
+    "gulp-requirejs": "^0.1.3",
+    "gulp-clean": "^0.3.2",
+    "gulp-uglify": "^1.5.3",
+    "gulp-sass": "^2.3.1"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^4.0.0",
+    "require": "^2.4.20"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

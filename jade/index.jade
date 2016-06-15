@@ -1,0 +1,169 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    title Diploma
+    include includes/cssandscripts.jade
+  body
+    .container
+      .row.panel.panel-default.panel-body
+        .col-md-12
+          span(data-bind='visible: !statusUser()[0]')
+            p
+              | Вы не авторизованы. Для продолжения работы в системе вам необходимо выполнить вход
+            button#stat.btn.btn-default(data-bind='click: auth') Выполнить вход
+          span(data-bind='visible: statusUser()[0]')
+            p
+              | Вы вошли в систему как 
+              a(data-bind='attr : {href: statusUser()[3]}')
+                strong
+                  span(data-bind='text: statusUser()[1]')
+                strong
+                  span(data-bind='text: statusUser()[2]')
+      .row.panel.panel-default.panel-body(data-bind='visible: statusUser()[0]')
+        .col-md-12
+          h2 Шаг 1: Первичный анализ группы.
+          br
+        .col-md-3
+          form.form-inline(action='', data-bind='submit: groupCheck')
+            label(for='groupName') Введите название группы:
+            input#groupName.form-control(type='text', data-bind='value: groupName', placeholder='Пример: DiveIntoTrip ')
+            input.btn.btn-default(type='submit', name='submitGroup', value='Запрос')
+          br
+          div(data-bind='visible: showInfoGroup')
+            // ko with: currentGroup()
+            p
+              strong Название : 
+              span(data-bind='text: name')
+            p
+              strong Количество участников : 
+              span(data-bind='text: countPeople')
+            p
+              strong Описание : 
+              span(data-bind='html: description')
+            // /ko
+            //
+              <form data-bind="submit: chooseParams">
+              <button type="submit">Продолжить</button>
+              </form>
+        .col-md-9
+          .panel.panel-default.panel-body(data-bind='visible: showInfoGroup')
+            p
+              strong Данные сортированные по :
+            .col-sm-6
+              table.table.table-bordered
+                caption странам.
+                thead
+                  tr
+                    th Страна
+                    th Кол-во пользователей
+                tbody(data-bind='foreach: listCountries')
+                  tr
+                    td(data-bind='text: title')
+                    td(data-bind='text: count')
+            .col-sm-6
+              table.table.table-bordered
+                caption городам.
+                thead
+                  tr
+                    th Город
+                    th Кол-во пользователей
+                tbody(data-bind='foreach: listCities')
+                  tr
+                    td(data-bind='text: title')
+                    td(data-bind='text: count')
+      .row.panel.panel-default.panel-body(data-bind='visible: showInfoGroup')
+        .col-md-12
+          h2 Шаг 2: Сбор данных об активности пользователей.
+          span.col-md-6
+            br
+            label(for='depth') Введите глубину исследования: 
+            form.form-inline(data-bind='submit: chooseParams')
+              input#depth.form-control(type='text', data-bind='value: depth', placeholder='Пример: 20')
+              button.btn.btn-default(type='submit') Собрать данные
+          span.col-md-6
+            ul.list-group
+              li.list-group-item(data-bind='visible: LCRLoaded()[0]')
+                span.badge
+                  span.glyphicon.glyphicon-ok
+                | Отметки "Мне нравится"
+              li.list-group-item(data-bind='visible: LCRLoaded()[1]')
+                span.badge
+                  span.glyphicon.glyphicon-ok
+                | Репосты
+              li.list-group-item(data-bind='visible: LCRLoaded()[2]')
+                span.badge
+                  span.glyphicon.glyphicon-ok
+                | Комментарии
+      .row.panel.panel-default.panel-body(data-bind='visible: showChooseParams')
+        .col-md-12
+          h2 Шаг 3: Выбор исследуемых характеристик целевой аудитории.
+          span.col-md-6
+            // ko with: currentGroup()
+            .form-inline
+              label(for='selectCountry') Выберите страну
+              select#selectCountry.form-control(name='countries', data-bind="options: country,\
+              optionsText: 'countryName',\
+              value: $root.selectedCountry,\
+              optionsCaption: 'Не выбрано'")
+            // /ko
+            .form-inline(data-bind='visible: selectedCountry')
+              label(for='selectCity') Выберите город
+              select#selectCity.form-control(name='cities', data-bind="options: getCitiesByCountry,\
+              optionsText: 'cname',\
+              value: $root.selectedCity,\
+              optionsCaption: 'Не выбрано'")
+          span.col-md-6
+            div(data-bind='visible: selectedCountry')
+              p
+                | Данные для выборки : Страна 
+                b
+                  span(data-bind="text : selectedCountry() ? selectedCountry().countryName : ''")
+                span(data-bind='visible: selectedCity()')
+                  | , город 
+                  b
+                    span(data-bind="text: selectedCity() ? selectedCity().cname : ''")
+              | 						Количество участников выборки: 
+              b
+                span(data-bind="text: getCertainUsers() ? getCertainUsers() : ''")
+      span(data-bind='visible: LCRLoaded()[2]')
+        .row.panel.panel-default.panel-body
+          .col-md-12
+            h2 Статистика
+            span.col-md-3
+              h4
+                | Общее количество 
+                br
+                |  (Из выбранной группы)
+              ul.list-group
+                li.list-group-item
+                  | лайков - 
+                  span.badge
+                    span(data-bind='text: computedLCR().likes ')
+                li.list-group-item
+                  | репостов - 
+                  span.badge
+                    span(data-bind='text: computedLCR().reposts ')
+                li.list-group-item
+                  | комментариев - 
+                  span.badge
+                    span(data-bind='text: computedLCR().comments ')
+            span.col-md-3
+              h4 Пять самых активных участников.
+              ul.list-group(data-bind='foreach : getSortedListUsersByER')
+                li.list-group-item
+                  span(data-bind='text: name')
+                  span.badge
+                    span(data-bind='text: value')
+          .col-md-12
+            br
+            label(for='amountPeople') Введите количественное значение выборки: 
+            form.form-inline(data-bind='submit: download ')
+              input#amountPeople.form-control(type='text', data-bind='value: amountPeople', placeholder='Пример: 20')
+              button.btn.btn-default(type='submit') Получить список
+          .col-md-12
+            p.panel.panel-default.panel-body(data-bind='visible: showSortedList')
+              span(data-bind='text: download()')
+
+    script(src='js/vk.js')
+    script(src='js/app.js')
